@@ -4,6 +4,10 @@ var winningBets = [],
 	totalPlacePool = 0;
 
 var stdin = process.openStdin();
+console.log("Instructions:")
+console.log("Enter bets in the format as specified in the test document. Press enter key to record next bet or result" + "\n");
+
+console.log("Please enter bet:")
 
 stdin.addListener("data", function(d) {
     if (d.toString().trim() === "exit") {
