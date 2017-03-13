@@ -6,16 +6,10 @@ var winningBets = [],
 var stdin = process.openStdin();
 
 stdin.addListener("data", function(d) {
-    // note:  d is an object, and when converted to a string it will
-    // end with a linefeed.  so we (rather crudely) account for that  
-    // with toString() and then trim() 
-    processInput(d);
-    /*console.log("you entered: [" + 
-        d.toString().trim() + "]");*/
-
-    if (d.toString().trim() === "no") {
-    	console.log("no entered");
+    if (d.toString().trim() === "exit") {
     	process.exit();
+    } else {
+    	processInput(d);
     }
   });
 
@@ -35,42 +29,14 @@ function processInput(input) {
 		var horseNumber = parseInt(bet[2], 10),
 			betAmount = parseInt(bet[3], 10);
 
-		//if(bet[1] === "P") {
 		  processBets(bet[1], horseNumber, betAmount);
-	  //} else if (bet[1] === "W") {
-		  //processWinningBets(horseNumber, betAmount);
-		  //processBets(bet[1], horseNumber, betAmount);
-	  //}
 	} 
 }
-
-/*function processWinningBets(horseNumber, betAmount) {
-
-	totalWinnPool = totalWinnPool + betAmount;
-
-	var result = winningBets.filter(function(bet) {
-		if (bet.horse === horseNumber) {
-			return bet;
-		}
-	});
-
-	if (result.length > 0) {
-		winningBets[winningBets.indexOf(result[0])].amount = winningBets[winningBets.indexOf(result[0])].amount + betAmount;
-	} else {
-		winningBets.push({
-			horse: horseNumber,
-			amount: betAmount
-		});
-	}
-}*/
 
 function checkHorseExistence(horseNumber) {
 	return function(bet) {
     if (bet.horse === horseNumber) {
-    	//console.log("horse found");
-    	//console.log(bet);
 			return bet;
-    	
     }
 	}
 }
@@ -106,7 +72,7 @@ function processBets(betType, horseNumber, betAmount) {
 
 function computeDividends(result) {
 	computeWinningDividend(result.first);
-	//computePlaceDividends(result)
+	computePlaceDividends(result)
 }
 
 function computeStakeOnPlaceHorse(horseNumber) {
@@ -136,9 +102,8 @@ function computePlaceDividends(result) {
 		dividendForSecondHorse = dividedWinPool/totalBetsForSecondHorse,
 		dividendForThirdHorse = dividedWinPool/totalBetsForThirdHorse;
 
-	console.log("First" + dividendForFirstHorse);
-	console.log("second" + dividendForSecondHorse);
-	console.log("third" + dividendForThirdHorse);
+	displayPlaceDividends(result, dividendForFirstHorse, dividendForSecondHorse, dividendForThirdHorse);
+
 }
 
 function computeNetPool(totalPool, percentage) {
@@ -147,7 +112,6 @@ function computeNetPool(totalPool, percentage) {
 
 function computeWinningDividend(horseNumber) {
 	var totalBetsForWinningHorse = 0;
-	//var netWinPool =  totalWinnPool - (totalWinnPool * 15/100);
 	var netWinPool = computeNetPool(totalWinnPool, 15);
 
 	var xyz = winningBets.filter(function(obj) {
@@ -157,7 +121,14 @@ function computeWinningDividend(horseNumber) {
 		}
 	});
 
-	var winDividend = netWinPool/totalBetsForWinningHorse;
-	console.log("Winning Dividend");
-	console.log(winDividend);
+	var winDividend = (netWinPool/totalBetsForWinningHorse).toFixed(2);
+	console.log("Win:" + horseNumber + ":$" + winDividend);
+}
+
+function displayPlaceDividends(result, divFirst, divSecond, divThird ) {
+	var horseSorted = [result.first, result.second, result.third];
+
+	for (var index = 0; index < horseSorted.length; index++) {
+		console.log("Place:" + horseSorted[index] + ":$" + (arguments[index + 1]).toFixed(2));
+	}
 }
